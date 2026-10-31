@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Skills to Sound — Omani Vocational Colleges & the 555 Piano</title>
+<meta name="description" content="Interactive presentation: Omani Vocational Colleges, Shinas Vocational College, and a 5-tone electronic piano built on the 555 timer.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='16' width='44' height='32' rx='6' fill='%23111'/%3E%3Ccircle cx='10' cy='32' r='5' fill='%232997ff'/%3E%3Cpath d='M20 32h6l3-8 6 16 3-8h6' stroke='%232997ff' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">{ "imports": { "three": "./assets/vendor/three.module.min.js" } }</script>
+</head>
+<body>
+<div id="stage">
+  <div class="bg"><div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div></div>
+
+  <!-- ============ 1 · HERO ============ -->
+  <section class="slide" id="s-hero" data-orbs="#0b3d91,#4b1d7a">
+    <div class="three" id="hero3d"></div>
+    <div class="copy">
+      <div class="eyebrow r" style="--i:0">Vocational Education · Sultanate of Oman</div>
+      <h1 class="r" style="--i:1">From Skills<br><span class="grad">to Sound.</span></h1>
+      <div class="tags r" style="--i:2">
+        <span class="tag" style="--c:var(--green)"><i></i>Omani Vocational Colleges</span>
+        <span class="tag" style="--c:var(--amber)"><i></i>Shinas Vocational College</span>
+        <span class="tag" style="--c:var(--blue)"><i></i>The 555 Electronic Piano</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · OVERVIEW ============ -->
+  <section class="slide" id="s-overview" data-orbs="#0a4d3c,#123a7a">
+    <div class="split">
+      <div>
+        <div class="eyebrow r" style="--i:0;color:var(--green)"><span class="num">01</span> The Network</div>
+        <h2 class="r" style="--i:1">Vocational Colleges<br>of <span class="grad-green">Oman.</span></h2>
+        <ul class="points">
+          <li class="r" style="--i:2;--c:var(--green)" data-tip="authority">Run by the <b>Ministry of Labour</b></li>
+          <li class="r" style="--i:3;--c:var(--cyan)" data-tip="practical">Hands-on, <b>industry-ready</b> skills</li>
+          <li class="r" style="--i:4;--c:var(--blue)" data-tip="pathways">Diploma &amp; Vocational Efficiency</li>
+        </ul>
+      </div>
+      <div class="stats">
+        <div class="stat glass hov r" style="--i:3;--c:#30d158" data-tip="st-colleges"><div class="v" data-count="8">0</div><div class="l">Colleges nationwide</div></div>
+        <div class="stat glass hov r" style="--i:4;--c:#64d2ff" data-tip="st-practical"><div class="v"><span data-count="85">0</span>%+</div><div class="l">Practical training</div></div>
+        <div class="stat glass hov r" style="--i:5;--c:#2997ff" data-tip="st-grads"><div class="v"><span data-count="1400">0</span>+</div><div class="l">Graduates in 2026</div></div>
+        <div class="stat glass hov r" style="--i:6;--c:#bf5af2" data-tip="st-spec"><div class="v" data-count="16">0</div><div class="l">Diploma specialisations</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · MAP ============ -->
+  <section class="slide" id="s-map" data-orbs="#0b3d91,#0a4d3c">
+    <div class="left">
+      <div class="eyebrow r" style="--i:0;color:var(--green)"><span class="num">01</span> Across the Sultanate</div>
+      <h2 class="r" style="--i:1">8 Colleges.<br><span class="grad">One mission.</span></h2>
+      <div class="clist r" style="--i:2" id="clist"></div>
+      <div class="legend r" style="--i:3"><span style="--c:var(--blue)"><i></i>Vocational College</span><span style="--c:var(--cyan)"><i></i>Marine Sciences</span><span style="--c:var(--amber)"><i></i>Spotlight</span></div>
+    </div>
+    <div class="mapwrap" id="omanMap"></div>
+  </section>
+
+  <!-- ============ 4 · WHAT THEY DO ============ -->
+  <section class="slide" id="s-do" data-orbs="#123a7a,#4b1d7a">
+    <div class="eyebrow r" style="--i:0;color:var(--green)"><span class="num">01</span> What they do</div>
+    <h2 class="r" style="--i:1">Learn by <span class="grad">doing.</span></h2>
+    <div class="flow r" style="--i:2" id="flow"></div>
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- ============ 5 · SHINAS ============ -->
+  <section class="slide" id="s-shinas" data-orbs="#7a4a0b,#0b3d91">
+    <div class="zoomwrap" id="shinasMap"></div>
+    <div class="left">
+      <div class="eyebrow r" style="--i:0;color:var(--amber)"><span class="num">02</span> Spotlight</div>
+      <h2 class="r" style="--i:1">Shinas<br><span class="grad-warm">Vocational College</span></h2>
+      <div class="arname ar r" style="--i:2">الكلية المهنية بشناص</div>
+      <ul class="points">
+        <li class="r" style="--i:3;--c:var(--amber)" data-tip="svc-loc">Al Aqar · <b>North Al Batinah</b></li>
+        <li class="r" style="--i:4;--c:var(--blue)" data-tip="svc-history">Training centre → <b>College</b></li>
+        <li class="r" style="--i:5;--c:var(--green)" data-tip="svc-core"><b>Electrical</b> &amp; electronics core</li>
+      </ul>
+    </div>
+    <div class="coord r" style="--i:6">
+      <span class="chip">24.74° N · 56.46° E</span>
+      <span class="chip"><b>Ministry of Labour</b></span>
+    </div>
+  </section>
+
+  <!-- ============ 6 · SHINAS PROGRAMS ============ -->
+  <section class="slide" id="s-programs" data-orbs="#7a4a0b,#4b1d7a">
+    <div style="position:absolute;left:130px;top:100px;z-index:3">
+      <div class="eyebrow r" style="--i:0;color:var(--amber)"><span class="num">02</span> Shinas · Programs</div>
+      <h2 class="r" style="--i:1;font-size:80px">What students <span class="grad-warm">master.</span></h2>
+    </div>
+    <div class="orbit r" style="--i:2" id="orbit"></div>
+    <div class="right">
+      <div class="chartbox glass r" style="--i:3;margin-top:110px">
+        <div class="ct">Graduates per year <span>NCSI · 2017–2024</span></div>
+        <canvas class="chart" id="gradChart" height="420"></canvas>
+      </div>
+      <div class="badge glass hov r" style="--i:4" data-tip="innovoex">
+        <div class="bi"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM17 6h3a3 3 0 0 1-3 4M7 6H4a3 3 0 0 0 3 4"/></svg></div>
+        <div><b>INNOVOEX 2025</b><span>Engineering projects exhibition</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 · PROJECT INTRO ============ -->
+  <section class="slide" id="s-project" data-orbs="#0b3d91,#7a4a0b">
+    <div class="left">
+      <div class="eyebrow r" style="--i:0"><span class="num">03</span> The Project</div>
+      <h2 class="r" style="--i:1">A piano made<br>of <span class="grad">physics.</span></h2>
+      <ul class="points">
+        <li class="r" style="--i:2;--c:var(--amber)"><b>5 keys</b> → 5 tones</li>
+        <li class="r" style="--i:3;--c:var(--blue)">One <b>555 timer</b> chip</li>
+        <li class="r" style="--i:4;--c:var(--green)">Powered by <b>9 V</b></li>
+      </ul>
+    </div>
+    <div class="photo r" style="--i:2" id="projPhoto"><img src="assets/img/breadboard.jpg" alt="5-tone 555 piano built on a breadboard"></div>
+  </section>
+
+  <!-- ============ 8 · PARTS 3D ============ -->
+  <section class="slide" id="s-parts" data-orbs="#123a7a,#0b3d91">
+    <div style="position:absolute;left:130px;top:100px;z-index:3">
+      <div class="eyebrow r" style="--i:0"><span class="num">03</span> Components</div>
+      <h2 class="r" style="--i:1;font-size:80px">9 parts. <span class="grad">1 instrument.</span></h2>
+    </div>
+    <div class="three r" style="--i:2" id="parts3d"></div>
+    <div class="info r" style="--i:3" id="partInfo"></div>
+    <div class="partbar r" style="--i:4" id="partBar"></div>
+    <div class="thumb r" style="--i:5;top:100px;bottom:auto" id="partsThumb"><img src="assets/img/components.jpg" alt="Original components list" style="object-position:50% 40%"><div class="cap">Original parts list</div></div>
+  </section>
+
+  <!-- ============ 9 · REAL BUILD ============ -->
+  <section class="slide" id="s-build" data-orbs="#0b3d91,#4b1d7a">
+    <div class="photo r" style="--i:0" id="buildPhoto"><img src="assets/img/breadboard.jpg" alt="Breadboard build"></div>
+    <div class="right">
+      <div class="eyebrow r" style="--i:1"><span class="num">03</span> The Build</div>
+      <h2 class="r" style="--i:2;font-size:84px">Built on a<br><span class="grad">breadboard.</span></h2>
+      <ul class="points">
+        <li class="r" style="--i:3;--c:var(--blue)">No soldering</li>
+        <li class="r" style="--i:4;--c:var(--amber)">Tap a key to hear it</li>
+        <li class="r" style="--i:5;--c:var(--green)">Easy to modify</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 10 · SCHEMATIC ============ -->
+  <section class="slide" id="s-circuit" data-orbs="#7a4a0b,#123a7a">
+    <div class="head">
+      <div>
+        <div class="eyebrow r" style="--i:0"><span class="num">04</span> Circuit Diagram</div>
+        <h2 class="r" style="--i:1;font-size:76px">Press a key. <span class="grad-warm">Follow the current.</span></h2>
+      </div>
+      <div class="readout r" style="--i:2">
+        <div class="glass" data-tip="rb"><span>R<sub>B</sub></span><b id="roRB">—</b></div>
+        <div class="glass" data-tip="freq"><span>Frequency</span><b id="roF" class="grad-warm">—</b></div>
+      </div>
+    </div>
+    <div class="board r" style="--i:3" id="schematic"></div>
+    <div class="thumb r" style="--i:5" id="origThumb"><img src="assets/img/schematic.jpg" alt="Original circuit diagram"><div class="cap">Original diagram</div></div>
+  </section>
+
+  <!-- ============ 11 · 555 PINOUT ============ -->
+  <section class="slide" id="s-pinout" data-orbs="#123a7a,#0b3d91">
+    <div class="head">
+      <div class="eyebrow r" style="--i:0"><span class="num">04</span> The Brain</div>
+      <h2 class="r" style="--i:1;font-size:84px">The <span class="grad">555</span> timer.</h2>
+    </div>
+    <div class="side">
+      <ul class="points rt" style="margin-top:20px">
+        <li class="r" style="--i:2;--c:var(--blue)">8 pins</li>
+        <li class="r" style="--i:3;--c:var(--amber)">Astable mode</li>
+        <li class="r" style="--i:4;--c:var(--green)">Square-wave output</li>
+      </ul>
+    </div>
+    <div class="three r" style="--i:2" id="pin3d"></div>
+    <svg class="leaders" id="pinLeaders"></svg>
+    <div id="pinLabels"></div>
+  </section>
+
+  <!-- ============ 12 · ASTABLE ============ -->
+  <section class="slide" id="s-astable" data-orbs="#0b3d91,#0a4d3c">
+    <div class="head">
+      <div>
+        <div class="eyebrow r" style="--i:0"><span class="num">04</span> How it oscillates</div>
+        <h2 class="r" style="--i:1;font-size:76px">Charge. Flip. <span class="grad">Repeat.</span></h2>
+      </div>
+      <div class="r" style="--i:2;text-align:right">
+        <div class="keyseg" id="astKeys"></div>
+        <div class="muted" style="font-size:22px;margin-top:12px" id="astSlow">Slow motion</div>
+      </div>
+    </div>
+    <div class="inner glass r" style="--i:3" id="internal"></div>
+    <div class="scope glass r" style="--i:4"><canvas class="chart" id="astChart"></canvas></div>
+  </section>
+
+  <!-- ============ 13 · FREQUENCY ============ -->
+  <section class="slide" id="s-freq" data-orbs="#7a4a0b,#4b1d7a">
+    <div class="left">
+      <div class="eyebrow r" style="--i:0"><span class="num">04</span> The Math</div>
+      <h2 class="r" style="--i:1;font-size:84px">Resistance sets<br>the <span class="grad-warm">pitch.</span></h2>
+      <div class="formula r" style="--i:2">
+        <span class="v" data-tip="f-f" style="color:var(--amber)">f</span> =
+        <span class="frac"><span>1.44</span><span>(<span class="v" data-tip="f-ra" style="color:var(--cyan)">R<sub>A</sub></span> + 2<span class="v" data-tip="f-rb" style="color:var(--blue)">R<sub>B</sub></span>) · <span class="v" data-tip="f-c" style="color:var(--violet)">C</span></span></span>
+      </div>
+      <ul class="points" style="margin-top:60px">
+        <li class="r" style="--i:3;--c:var(--blue)">More R → <b>lower note</b></li>
+        <li class="r" style="--i:4;--c:var(--violet)">Bigger C → <b>lower note</b></li>
+      </ul>
+      <div class="r" style="--i:5;margin-top:56px">
+        <div class="muted" style="font-size:24px;font-weight:600;letter-spacing:.12em;text-transform:uppercase">Try C1</div>
+        <div class="capseg" id="capSeg"></div>
+      </div>
+    </div>
+    <div class="chartwrap glass r" style="--i:3"><canvas class="chart" id="freqChart"></canvas></div>
+  </section>
+
+  <!-- ============ 14 · PIANO ============ -->
+  <section class="slide" id="s-piano" data-orbs="#0b3d91,#4b1d7a">
+    <div class="head">
+      <div class="eyebrow r" style="--i:0"><span class="num">05</span> Live Demo</div>
+      <h2 class="r" style="--i:1">Play it.</h2>
+      <div class="lead r" style="--i:2;margin-top:20px">Tap a key or press 1–5</div>
+      <div id="nowPlaying" class="r" style="--i:3"></div>
+    </div>
+    <div class="spk r" style="--i:2" id="spk3d"></div>
+    <div class="keys r" style="--i:3" id="pianoKeys"></div>
+    <div class="scopebox glass r" style="--i:4"><canvas class="chart" id="scope"></canvas></div>
+  </section>
+
+  <!-- ============ 15 · SKILLS ============ -->
+  <section class="slide" id="s-skills" data-orbs="#0a4d3c,#7a4a0b">
+    <div class="eyebrow r" style="--i:0;color:var(--green)"><span class="num">06</span> Why it matters</div>
+    <h2 class="r" style="--i:1">Skills, not just <span class="grad-green">circuits.</span></h2>
+    <div class="skills" id="skills"></div>
+  </section>
+
+  <!-- ============ 16 · REFERENCES ============ -->
+  <section class="slide" id="s-refs" data-orbs="#1a1a2e,#123a7a">
+    <div class="eyebrow r" style="--i:0"><span class="num">07</span> Sources</div>
+    <h2 class="r" style="--i:1;font-size:80px">References</h2>
+    <div class="refs r" style="--i:2" id="refs"></div>
+  </section>
+
+  <!-- ============ 17 · THANKS ============ -->
+  <section class="slide" id="s-end" data-orbs="#0b3d91,#4b1d7a">
+    <div class="three" id="end3d"></div>
+    <div class="copy">
+      <h1 class="r" style="--i:0">Thank <span class="grad">you.</span></h1>
+      <div class="lead r" style="--i:1;margin-top:34px">Questions?</div>
+    </div>
+  </section>
+
+  <div id="tip"></div>
+  <div id="progress"></div>
+  <div id="dots"></div>
+  <div id="brand"><i></i>Shinas Vocational College</div>
+  <div id="counter"></div>
+  <button class="navbtn" id="prevBtn" aria-label="Previous">‹</button>
+  <button class="navbtn" id="nextBtn" aria-label="Next">›</button>
+  <div id="hint"><kbd>←</kbd><kbd>→</kbd> navigate <kbd>F</kbd> full screen · hover for details</div>
+</div>
+<script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
