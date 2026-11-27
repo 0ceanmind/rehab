@@ -1,5 +1,5 @@
 import { HeroScene, PartsScene, PinoutScene, SpeakerScene, PARTS } from './scenes.js';
-import { TIPS, SPECS, PART_INFO, PINS, SKILLS, REFS } from './data.js';
+import { TIPS, SPECS, PART_INFO, PINS, SKILLS } from './data.js';
 import { buildOmanMap, buildShinasZoom, buildFlow, buildOrbit, buildSchematic, buildInternal } from './diagrams.js';
 import { gradChart, freqChart, astableChart, scope } from './charts.js';
 import { KEYS, timing, noteOn, noteOff, level, fmtHz, nearestNote, fmtR } from './audio.js';
@@ -55,8 +55,6 @@ function countUp(root) {
 $('#tiles').innerHTML = SPECS.map((s, i) => { TIPS['spec-' + i] = { k: 'Specialisation', t: s.k, c: s.c, b: s.b }; return `<div class="tile glass hov r" style="--i:${i + 3};--c:${s.c}" data-tip="spec-${i}"><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
 // skills
 $('#skills').innerHTML = SKILLS.map((s, i) => { TIPS['skill-' + i] = { k: 'Skill ' + (i + 1), t: s.k, c: s.c, b: s.b }; return `<div class="skill glass hov r" style="--i:${i + 2};--c:${s.c}" data-tip="skill-${i}"><span class="n">0${i + 1}</span><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
-// references
-$('#refs').innerHTML = REFS.map(([t, u], i) => `<div><em>${String(i + 1).padStart(2, '0')}</em>${t}<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https?:\/\//, '')}</a></div>`).join('');
 // breadboard hotspots
 const HS = [
   { x: 30.7, y: 28, tip: 'hs-spk' }, { x: 95.2, y: 69, tip: 'hs-bat' }, { x: 70.6, y: 64, tip: 'hs-555' }, { x: 64.5, y: 55.3, tip: 'hs-c3' },

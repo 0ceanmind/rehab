@@ -232,7 +232,7 @@ canvas.chart { width: 100%; display: block; }
 .lbl.pinno { font: 500 20px 'Mono'; fill: var(--muted); }
 .node { fill: #c9d3e3; }
 .flowp { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2 26; opacity: 0; transition: opacity .4s; }
-.flowp.on { opacity: 1; animation: march .7s linear infinite; }
+.flowp.on { opacity: 1; animation: march 1.8s linear infinite; }
 .flowp.chg { stroke: var(--amber); filter: drop-shadow(0 0 6px var(--amber)); }
 .flowp.dis { stroke: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan)); }
 .flowp.out { stroke: var(--green); filter: drop-shadow(0 0 6px var(--green)); }
