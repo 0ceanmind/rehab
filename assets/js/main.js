@@ -1,8 +1,9 @@
 import { HeroScene, PartsScene, PinoutScene, SpeakerScene, PARTS } from './scenes.js';
-import { TIPS, SPECS, PART_INFO, PINS, SKILLS, REFS } from './data.js';
+import { TIPS, SPECS, PART_INFO, PINS, SKILLS } from './data.js';
 import { buildOmanMap, buildShinasZoom, buildFlow, buildOrbit, buildSchematic, buildInternal } from './diagrams.js';
 import { gradChart, freqChart, astableChart, scope } from './charts.js';
 import { KEYS, timing, noteOn, noteOff, level, fmtHz, nearestNote, fmtR } from './audio.js';
+import { t, lang, setLang, initLang } from './i18n.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -15,9 +16,11 @@ addEventListener('resize', fit); fit();
 /* ================= TOOLTIP ================= */
 const tip = $('#tip'); let tipEl = null;
 function tipHTML(d) {
-  return `${d.k ? `<div class="k">${d.k}</div>` : ''}<div class="t">${d.t.replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>')}</div>${d.ar ? `<div class="ar">${d.ar}</div>` : ''}
-  ${d.b ? `<div class="b">${d.b.map(x => `<div>${x.replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>')}</div>`).join('')}</div>` : ''}
-  ${d.s ? `<div class="s">${d.s.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>` : ''}${d.src ? `<div class="src">${d.src}</div>` : ''}`;
+  const sub = x => t(x).replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>');
+  const second = lang === 'ar' ? '' : d.ar; // the Arabic name line is redundant in Arabic mode
+  return `${d.k ? `<div class="k">${t(d.k)}</div>` : ''}<div class="t">${sub(d.t)}</div>${second ? `<div class="ar">${second}</div>` : ''}
+  ${d.b ? `<div class="b">${d.b.map(x => `<div>${sub(x)}</div>`).join('')}</div>` : ''}
+  ${d.s ? `<div class="s">${d.s.map(([v, l]) => `<div><b>${t(v)}</b><span>${t(l)}</span></div>`).join('')}</div>` : ''}${d.src ? `<div class="src">${t(d.src)}</div>` : ''}`;
 }
 function showTip(el) {
   const d = TIPS[el.dataset.tip]; if (!d) return;
@@ -55,8 +58,6 @@ function countUp(root) {
 $('#tiles').innerHTML = SPECS.map((s, i) => { TIPS['spec-' + i] = { k: 'Specialisation', t: s.k, c: s.c, b: s.b }; return `<div class="tile glass hov r" style="--i:${i + 3};--c:${s.c}" data-tip="spec-${i}"><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
 // skills
 $('#skills').innerHTML = SKILLS.map((s, i) => { TIPS['skill-' + i] = { k: 'Skill ' + (i + 1), t: s.k, c: s.c, b: s.b }; return `<div class="skill glass hov r" style="--i:${i + 2};--c:${s.c}" data-tip="skill-${i}"><span class="n">0${i + 1}</span><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
-// references
-$('#refs').innerHTML = REFS.map(([t, u], i) => `<div><em>${String(i + 1).padStart(2, '0')}</em>${t}<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https?:\/\//, '')}</a></div>`).join('');
 // breadboard hotspots
 const HS = [
   { x: 30.7, y: 28, tip: 'hs-spk' }, { x: 95.2, y: 69, tip: 'hs-bat' }, { x: 70.6, y: 64, tip: 'hs-555' }, { x: 64.5, y: 55.3, tip: 'hs-c3' },
@@ -223,6 +224,7 @@ addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
   else if (k === 'Home') go(0);
   else if (k === 'End') go(slides.length - 1);
+  else if (k === 'l' || k === 'L') setLang(lang === 'ar' ? 'en' : 'ar');
   else if (k === 'f' || k === 'F') { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
   else if (/^[1-5]$/.test(k)) {
     const i = +k - 1, h = hooks[slides[cur].id];
@@ -238,6 +240,7 @@ let sx = null;
 stage.addEventListener('pointerdown', e => { sx = e.target.closest('button,[data-tip],canvas,.pkey,.three,.sw') ? null : e.clientX; });
 stage.addEventListener('pointerup', e => { if (sx != null && Math.abs(e.clientX - sx) > 80) (e.clientX < sx ? next : prev)(); sx = null; });
 
+initLang();
 const start = parseInt(location.hash.slice(1)) - 1;
 go(Number.isFinite(start) && start >= 0 ? start : 0);
 setTimeout(() => { $('#hint').style.opacity = 0; }, 7000);

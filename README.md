@@ -9,10 +9,11 @@ An interactive presentation about Omani vocational colleges, Shinas Vocational C
 | --- | --- |
 | Next / previous slide | `→` `←` · `Space` · `PageDown` / `PageUp` (works with presenter clickers) |
 | Full screen | `F` |
+| Switch English ⇄ Arabic | `L` · or the EN / ع button (top right) |
 | Play piano notes (Circuit, Oscillation and Live Demo slides) | `1` – `5` |
 | Jump to a slide | add `#n` to the URL, e.g. `#10` |
 
-Hover any card, pin, component or chart bar for more detail.
+Hover any card, pin, component or chart bar for more detail. Add `?lang=ar` to the URL to open the deck in Arabic.
 
 ## Contents
 - 3D models built in Three.js (555 IC, resistors, capacitors, push button, speaker, 9 V battery)

@@ -232,7 +232,7 @@ canvas.chart { width: 100%; display: block; }
 .lbl.pinno { font: 500 20px 'Mono'; fill: var(--muted); }
 .node { fill: #c9d3e3; }
 .flowp { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2 26; opacity: 0; transition: opacity .4s; }
-.flowp.on { opacity: 1; animation: march .7s linear infinite; }
+.flowp.on { opacity: 1; animation: march 1.8s linear infinite; }
 .flowp.chg { stroke: var(--amber); filter: drop-shadow(0 0 6px var(--amber)); }
 .flowp.dis { stroke: var(--cyan); filter: drop-shadow(0 0 6px var(--cyan)); }
 .flowp.out { stroke: var(--green); filter: drop-shadow(0 0 6px var(--green)); }
@@ -332,3 +332,27 @@ canvas.chart { width: 100%; display: block; }
 
 /* lightbox fallback / print */
 @media print { .slide { position: relative; opacity: 1; visibility: visible; page-break-after: always; } }
+
+/* ================= LANGUAGE SWITCH ================= */
+#langBtn { position: absolute; top: 30px; right: 40px; z-index: 60; display: flex; gap: 4px; padding: 5px; border-radius: 100px; background: rgba(28,28,32,.7); border: 1px solid var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); cursor: pointer; font: inherit; color: var(--muted); transition: border-color .3s, background .3s; }
+#langBtn:hover { border-color: rgba(255,255,255,.35); background: rgba(40,40,46,.85); }
+#langBtn span { min-width: 58px; height: 40px; padding: 0 16px; border-radius: 100px; display: grid; place-items: center; font-size: 19px; font-weight: 700; letter-spacing: .08em; transition: background .3s, color .3s; }
+#langBtn span[data-l="ar"] { font-family: 'Kufi', sans-serif; font-size: 22px; letter-spacing: 0; }
+#langBtn span.on { background: #fff; color: #000; }
+
+/* ================= ARABIC MODE ================= */
+/* text runs right-to-left, but each block keeps its place in the slide layout */
+.lang-ar #stage :is(h1, h2, .eyebrow, .lead, ul.points, .tags, .legend, .clist) { direction: rtl; width: fit-content; max-width: 100%; }
+.lang-ar #stage :is(.stat, .tile, .skill, .fnode, .onode, .olegend, .info, .chartbox, .badge, .thumb .cap, .readout, .coord, .chip, #nowPlaying, .muted), .lang-ar #tip, .lang-ar #brand, .lang-ar #hint { direction: rtl; }
+.lang-ar #s-astable .head > .r, .lang-ar #s-pinout .side { direction: rtl; }
+.lang-ar #stage, .lang-ar #stage * { letter-spacing: 0 !important; }
+.lang-ar #stage .eyebrow, .lang-ar #tip .k, .lang-ar .readout span, .lang-ar #brand, .lang-ar .wlabel { text-transform: none; }
+.lang-ar h1 { line-height: 1.25; font-size: 132px; }
+.lang-ar h2 { line-height: 1.3; }
+.lang-ar .lead, .lang-ar #tip .b, .lang-ar ul.points li { line-height: 1.5; }
+.lang-ar ul.points li { padding-left: 0; padding-right: 44px; }
+.lang-ar ul.points li::before { left: auto; right: 0; top: .6em; }
+.lang-ar .ar.arname { font-family: 'Inter', sans-serif; direction: ltr; }
+.lang-ar #stage .stat .v, .lang-ar #stage .readout b, .lang-ar #stage .pval, .lang-ar #stage .qty { direction: ltr; unicode-bidi: isolate; }
+.lang-ar #stage .stat .v { text-align: right; }
+.lang-ar #stage .arname { display: none; }

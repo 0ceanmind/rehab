@@ -1,6 +1,7 @@
 // Canvas live charts
 import { SHINAS_GRADS } from './data.js';
 import { KEYS, timing, fmtHz, fmtR, nearestNote, VCC, RA, blip, getAnalyser, activeCount } from './audio.js';
+import { t } from './i18n.js';
 
 export function fitCanvas(cv, cssH) {
   const w = cv.clientWidth || cv.parentElement.clientWidth;
@@ -15,7 +16,7 @@ export function fitCanvas(cv, cssH) {
   return { g, w, h };
 }
 const ease = t => 1 - Math.pow(1 - t, 3);
-const FONT = (s, w = 600) => `${w} ${s}px Inter, sans-serif`;
+const FONT = (s, w = 600) => `${w} ${s}px Inter, Kufi, sans-serif`;
 function rr(g, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function mouseOf(cv, e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * cv.clientWidth, (e.clientY - r.top) / r.height * cv.clientHeight]; }
 
@@ -44,7 +45,7 @@ export function gradChart(cv) {
     });
     const ay = bot - (avg / max) * (bot - top) * k;
     g.setLineDash([8, 10]); g.strokeStyle = 'rgba(255,255,255,.45)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, ay); g.lineTo(w, ay); g.stroke(); g.setLineDash([]);
-    g.fillStyle = 'rgba(255,255,255,.75)'; g.font = FONT(20, 600); g.textAlign = 'right'; g.fillText('- - -  average ' + Math.round(avg), w - 4, 20);
+    g.fillStyle = 'rgba(255,255,255,.75)'; g.font = FONT(20, 600); g.textAlign = 'right'; g.fillText(t('- - -  average ' + Math.round(avg)), w - 4, 20);
     raf = requestAnimationFrame(draw);
   }
   return { enter() { dims = { c: fitCanvas(cv, 420) }; t0 = performance.now() + 500; raf = requestAnimationFrame(draw); }, leave() { cancelAnimationFrame(raf); } };
@@ -77,7 +78,7 @@ export function freqChart(cv, segEl) {
       g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 1; g.beginPath(); g.moveTo(left, y); g.lineTo(w, y); g.stroke();
       g.fillStyle = '#8e8e93'; g.fillText(v >= 1000 ? (v / 1000) + 'k' : v, left - 14, y + 7);
     }
-    g.save(); g.translate(24, (top + bot) / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.fillStyle = '#8e8e93'; g.font = FONT(20, 600); g.fillText('FREQUENCY (Hz)', 0, 0); g.restore();
+    g.save(); g.translate(24, (top + bot) / 2); g.rotate(-Math.PI / 2); g.textAlign = 'center'; g.fillStyle = '#8e8e93'; g.font = FONT(20, 600); g.fillText(t('FREQUENCY (Hz)'), 0, 0); g.restore();
     KEYS.forEach((k, i) => {
       cur[i] += (vals[i] - cur[i]) * 0.09;
       const bh = cur[i] / curMax * (bot - top), x = x0 + i * (bw + gap), y = bot - bh;
@@ -92,7 +93,7 @@ export function freqChart(cv, segEl) {
       g.font = FONT(19, 500); g.fillStyle = '#8e8e93'; g.fillText(fmtR(k.RB), x + bw / 2, bot + 70);
       if (hover === i) {
         const tm = timing(k.RB, C), nn = nearestNote(tm.f);
-        const lines = [`${k.id} · ${fmtHz(tm.f)}`, `R_B ${fmtR(k.RB)} · T ${(tm.T * 1000).toFixed(2)} ms`, `≈ ${nn.name} · click to hear`];
+        const lines = [`${k.id} · ${fmtHz(tm.f)}`, `R_B ${fmtR(k.RB)} · T ${(tm.T * 1000).toFixed(2)} ms`, `≈ ${nn.name} · ${t('click to hear')}`];
         const bx = Math.min(w - 380, Math.max(left, x + bw / 2 - 190)), by = Math.max(4, y - 190);
         g.fillStyle = 'rgba(28,28,32,.95)'; rr(g, bx, by, 380, 130, 18); g.fill(); g.strokeStyle = COLS[i]; g.lineWidth = 2; g.stroke();
         g.textAlign = 'left'; g.fillStyle = '#fff'; g.font = FONT(28, 750); g.fillText(lines[0], bx + 22, by + 42);
@@ -131,8 +132,8 @@ export function astableChart(cv, keysEl, slowEl, internal) {
     const L = 70, R = w - 20, aTop = 60, aBot = h * 0.58, oTop = h * 0.70, oBot = h - 40;
     const yV = v => aBot - (v / VCC) * (aBot - aTop);
     // labels
-    g.font = FONT(24, 700); g.textAlign = 'left'; g.fillStyle = '#bf5af2'; g.fillText('C1 voltage', L, 30);
-    g.fillStyle = '#30d158'; g.fillText('Output · pin 3', L, oTop - 18);
+    g.font = FONT(24, 700); g.textAlign = 'left'; g.fillStyle = '#bf5af2'; g.fillText(t('C1 voltage'), L, 30);
+    g.fillStyle = '#30d158'; g.fillText(t('Output · pin 3'), L, oTop - 18);
     // grid + thresholds
     g.font = FONT(19, 600); g.textAlign = 'right';
     [[0, '#8e8e93', '0 V'], [3, '#64d2ff', '3 V · ⅓'], [6, '#ffb340', '6 V · ⅔'], [9, '#8e8e93', '9 V']].forEach(([v, c, t]) => {
@@ -151,13 +152,13 @@ export function astableChart(cv, keysEl, slowEl, internal) {
     const yO = s => s ? oTop + 10 : oBot;
     g.beginPath(); hist.forEach(([, s], i) => { const x = R - (n - 1 - i) * dx, y = yO(s); if (!i) g.moveTo(x, y); else { g.lineTo(x, yO(hist[i - 1][1])); g.lineTo(x, y); } });
     g.strokeStyle = '#30d158'; g.lineWidth = 5; g.shadowColor = '#30d158'; g.shadowBlur = 16; g.stroke(); g.shadowBlur = 0;
-    g.font = FONT(19, 600); g.fillStyle = '#8e8e93'; g.textAlign = 'right'; g.fillText('HIGH', L - 12, oTop + 17); g.fillText('LOW', L - 12, oBot + 6);
+    g.font = FONT(19, 600); g.fillStyle = '#8e8e93'; g.textAlign = 'right'; g.fillText(t('HIGH'), L - 12, oTop + 17); g.fillText(t('LOW'), L - 12, oBot + 6);
     // live head
     const hx = R, hy = yV(vc);
     g.fillStyle = '#fff'; g.beginPath(); g.arc(hx, hy, 8, 0, Math.PI * 2); g.fill();
     // phase pill
     const ch = state === 'charge';
-    g.font = FONT(24, 750); const txt = ch ? 'CHARGING ↑' : 'DISCHARGING ↓'; const tw = g.measureText(txt).width + 40;
+    g.font = FONT(24, 750); const txt = t(ch ? 'CHARGING ↑' : 'DISCHARGING ↓'); const tw = g.measureText(txt).width + 40;
     g.fillStyle = ch ? 'rgba(255,179,64,.18)' : 'rgba(100,210,255,.18)'; rr(g, R - tw, 8, tw, 42, 21); g.fill();
     g.strokeStyle = ch ? '#ffb340' : '#64d2ff'; g.lineWidth = 2; g.stroke();
     g.fillStyle = ch ? '#ffb340' : '#64d2ff'; g.textAlign = 'center'; g.fillText(txt, R - tw / 2, 38);
@@ -169,7 +170,7 @@ export function astableChart(cv, keysEl, slowEl, internal) {
         const [v, s] = hist[i]; const bx = Math.min(R - 230, hoverX + 14), by = yV(v) - 90;
         g.fillStyle = 'rgba(28,28,32,.95)'; rr(g, bx, by, 220, 76, 14); g.fill();
         g.fillStyle = '#fff'; g.textAlign = 'left'; g.font = FONT(24, 750); g.fillText(`Vc = ${v.toFixed(2)} V`, bx + 16, by + 32);
-        g.fillStyle = s ? '#30d158' : '#8e8e93'; g.font = FONT(20, 600); g.fillText(`Output ${s ? 'HIGH' : 'LOW'}`, bx + 16, by + 60);
+        g.fillStyle = s ? '#30d158' : '#8e8e93'; g.font = FONT(20, 600); g.fillText(t(`Output ${s ? 'HIGH' : 'LOW'}`), bx + 16, by + 60);
       }
     }
     raf = requestAnimationFrame(draw);
@@ -190,8 +191,8 @@ export function scope(cv, labelFn) {
     g.strokeStyle = 'rgba(255,255,255,.07)'; g.lineWidth = 1;
     for (let x = 0; x <= w; x += w / 10) { g.beginPath(); g.moveTo(x, 40); g.lineTo(x, h); g.stroke(); }
     for (let y = 40; y <= h; y += (h - 40) / 4) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
-    g.font = FONT(22, 700); g.fillStyle = '#30d158'; g.textAlign = 'left'; g.fillText('OSCILLOSCOPE · speaker signal', 0, 24);
-    const lab = labelFn(); g.textAlign = 'right'; g.fillStyle = '#8e8e93'; g.fillText(lab, w, 24);
+    g.font = FONT(22, 700); g.fillStyle = '#30d158'; g.textAlign = 'left'; g.fillText(t('OSCILLOSCOPE · speaker signal'), 0, 24);
+    const lab = t(labelFn()); g.textAlign = 'right'; g.fillStyle = '#8e8e93'; g.fillText(lab, w, 24);
     const an = getAnalyser(); const mid = 40 + (h - 40) / 2, amp = (h - 60) / 2;
     g.beginPath();
     if (an && activeCount()) {

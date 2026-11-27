@@ -217,7 +217,7 @@ export function buildSchematic(el, ro) {
       tag.style.opacity = 1; tagTxt.textContent = c ? 'CHARGING' : 'DISCHARGING';
       tag.querySelector('rect').setAttribute('stroke', c ? 'var(--amber)' : 'var(--cyan)');
       tag.querySelector('rect').setAttribute('fill', c ? 'rgba(255,179,64,.18)' : 'rgba(100,210,255,.18)');
-      ph++; phaseTimer = setTimeout(cycle, (c ? tm.duty : 1 - tm.duty) * 2400);
+      ph++; phaseTimer = setTimeout(cycle, (c ? tm.duty : 1 - tm.duty) * 6000);
     };
     cycle();
     if (sound) blip('sch', tm.f, tm.duty, 700);
@@ -225,7 +225,7 @@ export function buildSchematic(el, ro) {
   sws.forEach((w, i) => w.addEventListener('click', () => { userTouched = true; clearInterval(demoTimer); select(i, true); }));
   return {
     select: i => { userTouched = true; clearInterval(demoTimer); select(i, true); },
-    enter() { userTouched = false; let j = 0; select(-1); demoTimer = setInterval(() => { if (!userTouched) select(j++ % 5, false); }, 3200); setTimeout(() => { if (!userTouched) select(j++ % 5, false); }, 1400); },
+    enter() { userTouched = false; let j = 0; select(-1); demoTimer = setInterval(() => { if (!userTouched) select(j++ % 5, false); }, 8000); setTimeout(() => { if (!userTouched) select(j++ % 5, false); }, 1400); },
     leave() { clearInterval(demoTimer); clearTimeout(phaseTimer); },
   };
 }
