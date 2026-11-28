@@ -9,12 +9,15 @@ An interactive presentation about Omani vocational colleges, Shinas Vocational C
 | --- | --- |
 | Next / previous slide | `→` `←` · `Space` · `PageDown` / `PageUp` (works with presenter clickers) |
 | Full screen | `F` |
+| Switch English ⇄ Arabic | `L`, or the **EN / عربي** button at the top right |
 | Play piano notes (Circuit, Oscillation and Live Demo slides) | `1` – `5` |
 | Jump to a slide | add `#n` to the URL, e.g. `#10` |
+| Open directly in Arabic | add `?lang=ar`, e.g. `https://0ceanmind.github.io/rehab/?lang=ar` |
 
 Hover any card, pin, component or chart bar for more detail.
 
 ## Contents
+- Fully bilingual (English / Arabic): every slide, hover card, chart and diagram label, with a right-to-left layout in Arabic
 - 3D models built in Three.js (555 IC, resistors, capacitors, push button, speaker, 9 V battery)
 - An interactive Oman map with all 8 vocational colleges
 - An interactive schematic with animated current flow

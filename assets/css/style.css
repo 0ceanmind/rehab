@@ -53,10 +53,10 @@ h3 { font-size: 48px; font-weight: 700; letter-spacing: -.02em; }
 .muted { color: var(--muted); }
 
 ul.points { list-style: none; display: flex; flex-direction: column; gap: 30px; margin-top: 56px; }
-ul.points li { font-size: 42px; font-weight: 500; color: var(--fg2); display: block; position: relative; padding-left: 44px; letter-spacing: -.01em; line-height: 1.2; }
-ul.points li::before { content: ''; position: absolute; left: 0; top: .44em; width: 14px; height: 14px; border-radius: 50%; background: var(--c, var(--blue)); box-shadow: 0 0 22px var(--c, var(--blue)); }
-ul.points.rt li { padding-left: 0; padding-right: 44px; text-align: right; }
-ul.points.rt li::before { left: auto; right: 0; }
+ul.points li { font-size: 42px; font-weight: 500; color: var(--fg2); display: block; position: relative; padding-inline-start: 44px; letter-spacing: -.01em; line-height: 1.2; }
+ul.points li::before { content: ''; position: absolute; inset-inline-start: 0; top: .44em; width: 14px; height: 14px; border-radius: 50%; background: var(--c, var(--blue)); box-shadow: 0 0 22px var(--c, var(--blue)); }
+html:not([dir=rtl]) ul.points.rt li { padding-inline-start: 0; padding-inline-end: 44px; text-align: right; }
+html:not([dir=rtl]) ul.points.rt li::before { inset-inline-start: auto; inset-inline-end: 0; }
 ul.points li b { color: var(--fg); font-weight: 700; }
 
 .glass { background: var(--glass); border: 1px solid var(--line); border-radius: 36px; backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%); }
@@ -72,10 +72,10 @@ ul.points li b { color: var(--fg); font-weight: 700; }
 #tip::before { content: ''; position: absolute; left: 38px; right: 38px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--tc, var(--blue)); box-shadow: 0 0 24px var(--tc, var(--blue)); }
 #tip .k { font-size: 22px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--tc, var(--blue)); margin-bottom: 10px; }
 #tip .t { font-size: 40px; font-weight: 750; letter-spacing: -.02em; line-height: 1.1; }
-#tip .ar { font-size: 30px; color: var(--fg2); margin-top: 8px; }
+#tip .sub { font-size: 30px; color: var(--fg2); margin-top: 8px; }
 #tip .b { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
-#tip .b div { font-size: 28px; line-height: 1.35; color: var(--fg2); padding-left: 26px; position: relative; }
-#tip .b div::before { content: ''; position: absolute; left: 0; top: 15px; width: 9px; height: 9px; border-radius: 50%; background: var(--tc, var(--blue)); }
+#tip .b div { font-size: 28px; line-height: 1.35; color: var(--fg2); padding-inline-start: 26px; position: relative; }
+#tip .b div::before { content: ''; position: absolute; inset-inline-start: 0; top: 15px; width: 9px; height: 9px; border-radius: 50%; background: var(--tc, var(--blue)); }
 #tip .s { display: flex; gap: 14px; margin-top: 24px; }
 #tip .s div { flex: 1; background: rgba(255,255,255,.06); border-radius: 18px; padding: 16px 18px; }
 #tip .s b { display: block; font-size: 38px; font-weight: 750; letter-spacing: -.02em; color: var(--fg); }
@@ -156,7 +156,8 @@ ul.points li b { color: var(--fg); font-weight: 700; }
 
 /* ================= SHINAS ================= */
 #s-shinas .left { position: absolute; left: 130px; top: 120px; width: 900px; z-index: 2; }
-#s-shinas .arname { font-size: 64px; margin-top: 18px; color: var(--fg2); font-weight: 600; text-align: left; }
+#s-shinas .arname { font-size: 64px; margin-top: 18px; color: var(--fg2); font-weight: 600; text-align: start; }
+#s-shinas .arname .en { font-size: 52px; }
 #s-shinas .zoomwrap { position: absolute; right: 0; top: 0; width: 1000px; height: 1080px; }
 #s-shinas .coord { position: absolute; left: 130px; bottom: 130px; display: flex; gap: 22px; }
 .chip { font-size: 26px; font-weight: 600; padding: 14px 26px; border-radius: 100px; border: 1px solid var(--line); background: rgba(255,255,255,.05); color: var(--fg2); }
@@ -321,8 +322,8 @@ canvas.chart { width: 100%; display: block; }
 
 /* ================= REFERENCES ================= */
 .refs { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 60px; }
-.refs div { font-size: 22px; color: var(--fg2); line-height: 1.35; padding-left: 50px; position: relative; }
-.refs div em { position: absolute; left: 0; top: 0; font: 600 20px 'Mono'; font-style: normal; color: var(--blue); }
+.refs div { font-size: 22px; color: var(--fg2); line-height: 1.35; padding-inline-start: 50px; position: relative; }
+.refs div em { position: absolute; inset-inline-start: 0; top: 0; font: 600 20px 'Mono'; font-style: normal; color: var(--blue); }
 .refs div a { color: var(--muted); text-decoration: none; word-break: break-all; font-size: 18px; display: block; }
 
 /* ================= THANKS ================= */
@@ -332,3 +333,58 @@ canvas.chart { width: 100%; display: block; }
 
 /* lightbox fallback / print */
 @media print { .slide { position: relative; opacity: 1; visibility: visible; page-break-after: always; } }
+
+
+/* ================= LANGUAGE TOGGLE ================= */
+#langBtn { position: absolute; top: 30px; right: 60px; z-index: 46; display: flex; padding: 5px; gap: 4px; border-radius: 100px; border: 1px solid var(--line); background: rgba(255,255,255,.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); cursor: pointer; opacity: .75; transition: opacity .3s, background .3s; direction: ltr; }
+#langBtn:hover { opacity: 1; background: rgba(255,255,255,.1); }
+#langBtn span { min-width: 64px; height: 46px; padding: 0 16px; border-radius: 100px; display: grid; place-items: center; font: 700 22px 'Inter', 'Kufi', sans-serif; color: var(--muted); transition: background .35s var(--ease), color .35s; }
+#langBtn .l-ar { font-family: 'Kufi', sans-serif; font-size: 22px; }
+html:not([lang=ar]) #langBtn .l-en, html[lang=ar] #langBtn .l-ar { background: var(--fg); color: #000; }
+
+/* ================= ARABIC / RTL ================= */
+/* keep drawings, math, the keyboard and the slide chrome left-to-right */
+svg, canvas, .formula, #s-piano .keys, #dots, .keyseg, #s-pinout .plabel em, #counter, .navbtn, #progress { direction: ltr; }
+html[lang=ar] #stage, html[lang=ar] #stage * { letter-spacing: 0 !important; }
+html[lang=ar] .eyebrow { font-size: 30px; font-weight: 700; }
+html[lang=ar] h1 { font-size: 132px; line-height: 1.28; font-weight: 700; }
+html[lang=ar] #s-hero h1 { font-size: 148px; }
+html[lang=ar] #s-end h1 { font-size: 170px; }
+html[lang=ar] h2 { line-height: 1.3; font-weight: 700; font-size: 84px; }
+html[lang=ar] #stage h2[style*="font-size"] { font-size: 72px !important; }
+html[lang=ar] ul.points li { font-size: 40px; line-height: 1.45; }
+html[lang=ar] ul.points li::before { top: .62em; }
+html[lang=ar] ul.points { gap: 22px; }
+html[lang=ar] .lead { line-height: 1.5; }
+html[lang=ar] .stat .v { direction: ltr; text-align: right; letter-spacing: -.05em !important; }
+html[lang=ar] #s-programs .orbit { top: 250px; transform: scale(.93); transform-origin: 50% 0; }
+html[lang=ar] .stat .l { font-size: 28px; }
+html[lang=ar] #tip .t { line-height: 1.35; font-size: 36px; }
+html[lang=ar] #tip .b div { font-size: 26px; line-height: 1.6; }
+html[lang=ar] #tip .b div::before { top: 19px; }
+html[lang=ar] #tip .k { font-size: 22px; }
+html[lang=ar] .tile b { font-size: 28px; line-height: 1.35; }
+html[lang=ar] .skill b { font-size: 34px; line-height: 1.35; }
+html[lang=ar] .fnode b { font-size: 30px; }
+html[lang=ar] .onode { font-size: 25px; }
+html[lang=ar] .pname { line-height: 1.3 !important; }
+html[lang=ar] #s-parts .info .prole { line-height: 1.5; }
+html[lang=ar] .refs div { font-size: 21px; line-height: 1.5; }
+html[lang=ar] .refs div a { text-align: right; }
+html[lang=ar] .clist div.on, html[lang=ar] .clist div:hover { transform: translateX(-6px); }
+html[lang=ar] .formula { justify-content: flex-end; }
+html[lang=ar] .readout span { font-size: 22px; }
+html[lang=ar] #s-hero .three { right: auto; left: -40px; }
+html[lang=ar] #s-hero .copy { margin-top: 170px; }
+html[lang=ar] #nowPlaying span { margin-left: 0; margin-right: 16px; }
+html[lang=ar] .chartbox .ct { font-size: 28px; }
+html[lang=ar] #brand { font-size: 22px; }
+html[lang=ar] #roRB, html[lang=ar] #s-pinout .plabel { direction: ltr; }
+html[lang=ar] #roRB { text-align: right; }
+html[lang=ar] #s-freq .left { width: 820px; }
+html[lang=ar] .capseg { direction: ltr; justify-content: flex-end; }
+html[lang=ar] .pkey span { direction: rtl; }
+bdi { white-space: nowrap; }
+html[lang=ar] #s-freq .formula { margin-top: 10px; }
+html[lang=ar] #s-freq ul.points { margin-top: 28px !important; }
+html[lang=ar] #s-freq .left > div:last-child { margin-top: 26px !important; }

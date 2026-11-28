@@ -1,4 +1,5 @@
 // Circuit math + live 555-accurate synthesiser (pulse wave with the real duty cycle)
+import { isAr } from './i18n.js';
 export const VCC = 9;
 export const RA = 1000;            // R6
 export const C1_DEFAULT = 100e-9;  // C1
@@ -24,7 +25,7 @@ export function nearestNote(f) {
   const cents = Math.round((n - r) * 100);
   return { name: NOTE[(r % 12 + 12) % 12] + (Math.floor(r / 12) - 1), cents };
 }
-export const fmtHz = f => f >= 1000 ? (f / 1000).toFixed(2) + ' kHz' : Math.round(f) + ' Hz';
+export const fmtHz = (f, ar = isAr()) => f >= 1000 ? (f / 1000).toFixed(2) + (ar ? ' كيلوهرتز' : ' kHz') : Math.round(f) + (ar ? ' هرتز' : ' Hz');
 export const fmtR = r => r >= 1000 ? (r / 1000).toFixed(1).replace('.0', '') + ' kΩ' : r + ' Ω';
 
 let ctx, master, analyser, hp, voices = new Map(), waveCache = new Map();

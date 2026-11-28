@@ -2,6 +2,7 @@
 import { WILAYATS, MAP_BOUNDS, project } from './oman-map.js';
 import { COLLEGES, FLOW, PROGRAMS, TIPS } from './data.js';
 import { KEYS, timing, fmtHz, fmtR, nearestNote, blip, VCC } from './audio.js';
+import { t, isAr, onLang } from './i18n.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const HOSTS = { 'As Seeb': 'seeb', 'Saham': 'saham', 'Shinas': 'shinas', 'Ibri': 'ibri', 'Sur': 'sur', 'Al Buraymi': 'buraimi', 'Salalah': 'salalah', 'Al Khaburah': 'khaburah' };
@@ -17,14 +18,14 @@ export function buildOmanMap(el, listEl) {
     const cls = c.star ? 'star' : c.marine ? 'marine' : '';
     s += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><g class="pin ${cls}" style="--i:${i}" data-tip="col-${c.id}" data-c="${c.id}">
       <circle class="pulse" r="10"/><circle class="dot" r="10"/>
-      <text x="${c.dx}" y="${c.dy}" text-anchor="${c.anchor || 'start'}">${c.name}</text></g></g>`;
+      <text x="${c.dx}" y="${c.dy}" text-anchor="${c.anchor || 'start'}" data-ar="${c.name_ar}">${c.name}</text></g></g>`;
   });
   s += '</g></svg>';
   el.innerHTML = s;
   // stroke-draw animation per wilayat
   el.querySelectorAll('.wil').forEach(p => { const L = Math.ceil(p.getTotalLength()); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p.style.transition = 'stroke-dashoffset 2.6s cubic-bezier(.2,.8,.2,1), fill 1s ease 1.8s'; });
-  listEl.innerHTML = COLLEGES.map(c => `<div data-tip="col-${c.id}" data-c="${c.id}" style="--c:${c.star ? 'var(--amber)' : c.marine ? 'var(--cyan)' : 'var(--blue)'}"><i></i>${c.name}</div>`).join('');
-  COLLEGES.forEach(c => { TIPS['col-' + c.id] = { k: c.gov, t: c.full, ar: c.ar, c: c.star ? '#ffb340' : c.marine ? '#64d2ff' : '#2997ff', b: c.b }; });
+  listEl.innerHTML = COLLEGES.map(c => `<div data-tip="col-${c.id}" data-c="${c.id}" style="--c:${c.star ? 'var(--amber)' : c.marine ? 'var(--cyan)' : 'var(--blue)'}"><i></i><span data-ar="${c.name_ar}">${c.name}</span></div>`).join('');
+  COLLEGES.forEach(c => { TIPS['col-' + c.id] = { k: c.gov, k_ar: c.gov_ar, t: c.full, t_ar: c.ar, ar: c.ar, c: c.star ? '#ffb340' : c.marine ? '#64d2ff' : '#2997ff', b: c.b, b_ar: c.b_ar }; });
   const link = (id, on) => {
     el.querySelectorAll(`[data-c="${id}"]`).forEach(n => n.classList.toggle(n.classList.contains('wil') ? 'hot' : 'on', on));
     listEl.querySelectorAll(`[data-c="${id}"]`).forEach(n => n.classList.toggle('on', on));
@@ -51,10 +52,10 @@ export function buildShinasZoom(el) {
   s += `</g><g id="zlabels" style="opacity:0;transition:opacity 1s">
     <circle cx="${sx}" cy="${sy}" r="26" fill="url(#gl)"><animate attributeName="r" values="14;30;14" dur="2.6s" repeatCount="indefinite"/></circle>
     <circle cx="${sx}" cy="${sy}" r="3.2" fill="#ffb340" stroke="#fff" stroke-width="1.1"/>
-    <text x="${sx - 7}" y="${sy - 7}" text-anchor="end" style="font-size:9px;font-weight:800;fill:#ffb340;letter-spacing:.06em">SHINAS</text>
-    ${lbl('Liwa', 56.56, 24.52)}${lbl('Sohar', 56.75, 24.33)}${lbl('Saham', 56.92, 24.12)}${lbl('Al Buraimi', 56.0, 24.28)}${lbl('Gulf of Oman', 56.95, 24.85, 1)}${lbl('UAE', 56.15, 24.95)}
+    <text x="${sx - 7}" y="${sy - 7}" text-anchor="end" style="font-size:9px;font-weight:800;fill:#ffb340;letter-spacing:.06em" data-ar="شناص">SHINAS</text>
+    ${lbl('Liwa', 'لوى', 56.56, 24.52)}${lbl('Sohar', 'صحار', 56.75, 24.33)}${lbl('Saham', 'صحم', 56.92, 24.12)}${lbl('Al Buraimi', 'البريمي', 56.0, 24.28)}${lbl('Gulf of Oman', 'بحر عُمان', 56.95, 24.85, 1)}${lbl('UAE', 'الإمارات', 56.15, 24.95)}
   </g></svg>`;
-  function lbl(t, lon, lat, sea) { const [x, y] = project(lon, lat); return `<text x="${x}" y="${y}" style="font-size:${sea ? 6.5 : 5.5}px;font-weight:600;fill:${sea ? '#64d2ff' : '#8e8e93'};letter-spacing:.08em;${sea ? 'font-style:italic' : ''}">${t.toUpperCase()}</text>`; }
+  function lbl(en, ar, lon, lat, sea) { const [x, y] = project(lon, lat); return `<text x="${x}" y="${y}" style="font-size:${sea ? 6.5 : 5.5}px;font-weight:600;fill:${sea ? '#64d2ff' : '#8e8e93'};letter-spacing:.08em;${sea ? 'font-style:italic' : ''}" data-ar="${ar}">${en.toUpperCase()}</text>`; }
   el.innerHTML = s;
   const svg = el.querySelector('svg'), labels = el.querySelector('#zlabels');
   let raf;
@@ -88,12 +89,12 @@ export function buildFlow(el) {
     svg += `<path d="M${xb - 4},${y - 12} L${xb + 10},${y} L${xb - 4},${y + 12}" stroke="${FLOW[i + 1].c}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
   }
   svg += '</svg>';
-  el.innerHTML = svg + FLOW.map((f, i) => `<div class="fnode glass hov" data-tip="${f.tip}" style="left:${gap * i + gap / 2 - 150}px;--c:${f.c}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="${f.c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px ${f.c})">${f.ic}</svg><b>${f.k}</b><span>${f.s}</span></div>`).join('');
+  el.innerHTML = svg + FLOW.map((f, i) => `<div class="fnode glass hov" data-tip="${f.tip}" style="left:${gap * i + gap / 2 - 150}px;--c:${f.c}"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="${f.c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px ${f.c})">${f.ic}</svg><b data-ar="${f.k_ar}">${f.k}</b><span data-ar="${f.s_ar}">${f.s}</span></div>`).join('');
 }
 
 /* ---------------- PROGRAM HUB (spokes with live current) ---------------- */
 export function buildOrbit(el) {
-  const items = [...PROGRAMS.inner.map(p => ({ ...p, tier: 'Vocational Diploma' })), ...PROGRAMS.outer.map(p => ({ ...p, tier: 'Vocational Efficiency' }))];
+  const items = [...PROGRAMS.inner.map(p => ({ ...p, tier: 'Vocational Diploma', tier_ar: 'الدبلوم المهني' })), ...PROGRAMS.outer.map(p => ({ ...p, tier: 'Vocational Efficiency', tier_ar: 'الكفاءة المهنية' }))];
   const cx = 470, cy = 400, rx = 300, ry = 300;
   const pos = items.map((_, i) => { const th = -Math.PI / 2 + i * Math.PI * 2 / items.length; return [cx + Math.cos(th) * rx, cy + Math.sin(th) * ry]; });
   let svg = `<svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible" viewBox="0 0 900 820">`;
@@ -105,10 +106,10 @@ export function buildOrbit(el) {
     svg += `<circle r="5" fill="${p.c}" style="filter:drop-shadow(0 0 6px ${p.c})"><animateMotion dur="${2 + (i % 3) * 0.4}s" begin="${i * 0.25}s" repeatCount="indefinite" path="${d}"/></circle>`;
   });
   svg += '</svg>';
-  el.innerHTML = svg + `<div class="orb-center" style="left:${cx}px;top:${cy}px" data-tip="svc-core"><div>SVC<small>SHINAS</small></div></div>` +
-    items.map((p, i) => `<div class="onode${i >= PROGRAMS.inner.length ? ' eff' : ''}" data-tip="prog-${i}" style="--c:${p.c};left:${pos[i][0]}px;top:${pos[i][1]}px;--d:${i * 0.4}s"><i></i>${p.k}</div>`).join('') +
-    `<div class="olegend"><span>● Vocational Diploma</span><span>◌ Vocational Efficiency</span></div>`;
-  items.forEach((p, i) => { TIPS['prog-' + i] = { k: p.tier, t: p.k, c: p.c, b: p.b }; });
+  el.innerHTML = svg + `<div class="orb-center" style="left:${cx}px;top:${cy}px" data-tip="svc-core"><div>SVC<small data-ar="شناص">SHINAS</small></div></div>` +
+    items.map((p, i) => `<div class="onode${i >= PROGRAMS.inner.length ? ' eff' : ''}" data-tip="prog-${i}" style="--c:${p.c};left:${pos[i][0]}px;top:${pos[i][1]}px;--d:${i * 0.4}s"><i></i><span data-ar="${p.k_ar}">${p.k}</span></div>`).join('') +
+    `<div class="olegend"><span data-ar="● الدبلوم المهني">● Vocational Diploma</span><span data-ar="◌ الكفاءة المهنية">◌ Vocational Efficiency</span></div>`;
+  items.forEach((p, i) => { TIPS['prog-' + i] = { k: p.tier, k_ar: p.tier_ar, t: p.k, t_ar: p.k_ar, c: p.c, b: p.b, b_ar: p.b_ar }; });
   const spokes = [...el.querySelectorAll('.spoke')];
   el.querySelectorAll('.onode').forEach((n, i) => {
     n.addEventListener('pointerenter', () => { spokes[i].setAttribute('stroke-opacity', '1'); spokes[i].setAttribute('stroke-width', '5'); });
@@ -172,25 +173,29 @@ export function buildSchematic(el, ro) {
     <text class="lbl pinno" x="1292" y="222">8</text><text class="lbl pinno" x="1412" y="222">4</text><text class="lbl pinno" x="1292" y="462">1</text><text class="lbl pinno" x="1412" y="462">5</text><text class="lbl pinno" x="1450" y="327">3</text></g>`;
   // current-flow overlays
   s += `<path class="flowp chg" id="flChg"/><path class="flowp dis" id="flDis"/><path class="flowp out" id="flOut" d="M1470,335 H1640"/>`;
-  s += `<g id="phaseTag" style="opacity:0;transition:opacity .4s"><rect x="1000" y="610" width="140" height="44" rx="22" fill="rgba(255,179,64,.18)" stroke="var(--amber)"/><text id="phaseTxt" x="1070" y="640" text-anchor="middle" class="lbl" style="font-size:20px">CHARGING</text></g>`;
+  s += `<g id="phaseTag" style="opacity:0;transition:opacity .4s"><rect x="1000" y="610" width="140" height="44" rx="22" fill="rgba(255,179,64,.18)" stroke="var(--amber)"/><text id="phaseTxt" x="1070" y="640" text-anchor="middle" class="lbl" style="font-size:20px"></text></g>`;
   s += '</svg>';
   el.innerHTML = s;
 
   // tips
-  const T = (k, t, c, b) => { TIPS[k] = { k: 'Component', t, c, b }; };
-  T('sc-R1', 'R1 · 1 kΩ', '#64d2ff', ['End of the ladder', 'In R_B only for S1 (lowest note)']);
-  T('sc-R2', 'R2 · 1 kΩ', '#64d2ff', ['In R_B for S1 and S2']);
-  T('sc-R3', 'R3 · 1 kΩ', '#64d2ff', ['In R_B for S1 – S3']);
-  T('sc-R4', 'R4 · 1 kΩ', '#64d2ff', ['In R_B for S1 – S4']);
-  T('sc-R5', 'R5 · 5.1 kΩ', '#64d2ff', ['Always part of R_B', 'Alone it gives the highest note']);
-  T('sc-R6', 'R6 · 1 kΩ = R_A', '#64d2ff', ['From +9 V to pin 7', 'Only in the charging path']);
-  T('sc-C1', 'C1 · 100 nF', '#bf5af2', ['Timing capacitor on pins 6 & 2', 'Swings between 3 V and 6 V']);
-  T('sc-C2', 'C2 · 10 nF', '#bf5af2', ['Pin 5 to ground', 'Keeps the 6 V reference quiet']);
-  T('sc-C3', 'C3 · 10 µF', '#ffb340', ['Blocks DC from the speaker', 'Lets the tone pass']);
-  T('sc-SPK', 'Speaker · 8 Ω', '#30d158', ['Converts the square wave to sound']);
-  T('sc-BAT', 'Battery · 9 V', '#30d158', ['+ rail → pins 8 & 4, R6', '− rail → pin 1 & ground']);
-  T('sc-555', '555 Timer', '#2997ff', ['Astable mode', 'Pin 3 drives the speaker']);
-  KEYS.forEach((k, i) => { const tm = timing(k.RB), nn = nearestNote(tm.f); TIPS['sc-' + k.id] = { k: 'Key ' + (i + 1), t: `${k.id} → ${fmtHz(tm.f)}`, c: '#ffb340', b: [`R_B = ${k.chain.join(' + ')} = ${fmtR(k.RB)}`, `Period ${(tm.T * 1000).toFixed(2)} ms · duty ${(tm.duty * 100).toFixed(0)}%`, `≈ ${nn.name} (${nn.cents >= 0 ? '+' : ''}${nn.cents} cents)`] }; });
+  const T = (k, tt, c, b, b_ar, t_ar) => { TIPS[k] = { k: 'Component', k_ar: 'مكوّن', t: tt, t_ar, c, b, b_ar }; };
+  T('sc-R1', 'R1 · 1 kΩ', '#64d2ff', ['End of the ladder', 'In R_B only for S1 (lowest note)'], ['نهاية السُلّم', 'ضمن R_B مع S1 فقط (أخفض نغمة)']);
+  T('sc-R2', 'R2 · 1 kΩ', '#64d2ff', ['In R_B for S1 and S2'], ['ضمن R_B مع S1 و S2']);
+  T('sc-R3', 'R3 · 1 kΩ', '#64d2ff', ['In R_B for S1 – S3'], ['ضمن R_B من S1 إلى S3']);
+  T('sc-R4', 'R4 · 1 kΩ', '#64d2ff', ['In R_B for S1 – S4'], ['ضمن R_B من S1 إلى S4']);
+  T('sc-R5', 'R5 · 5.1 kΩ', '#64d2ff', ['Always part of R_B', 'Alone it gives the highest note'], ['جزء دائم من R_B', 'وحدها تعطي أعلى نغمة']);
+  T('sc-R6', 'R6 · 1 kΩ = R_A', '#64d2ff', ['From +9 V to pin 7', 'Only in the charging path'], ['من 9 V إلى الطرف 7', 'في مسار الشحن فقط']);
+  T('sc-C1', 'C1 · 100 nF', '#bf5af2', ['Timing capacitor on pins 6 & 2', 'Swings between 3 V and 6 V'], ['مكثف التوقيت على الطرفين 6 و 2', 'يتأرجح جهده بين 3 V و 6 V']);
+  T('sc-C2', 'C2 · 10 nF', '#bf5af2', ['Pin 5 to ground', 'Keeps the 6 V reference quiet'], ['من الطرف 5 إلى الأرضي', 'يُبقي مرجع 6 V مستقراً']);
+  T('sc-C3', 'C3 · 10 µF', '#ffb340', ['Blocks DC from the speaker', 'Lets the tone pass'], ['يحجب التيار المستمر عن السماعة', 'ويسمح بمرور النغمة']);
+  T('sc-SPK', 'Speaker · 8 Ω', '#30d158', ['Converts the square wave to sound'], ['تحوّل الموجة المربعة إلى صوت'], 'السماعة · 8 Ω');
+  T('sc-BAT', 'Battery · 9 V', '#30d158', ['+ rail → pins 8 & 4, R6', '− rail → pin 1 & ground'], ['الخط الموجب ← الطرفان 8 و 4 و R6', 'الخط السالب ← الطرف 1 والأرضي'], 'البطارية · 9 V');
+  T('sc-555', '555 Timer', '#2997ff', ['Astable mode', 'Pin 3 drives the speaker'], ['وضع التذبذب الحر', 'الطرف 3 يقود السماعة'], 'المؤقّت 555');
+  KEYS.forEach((k, i) => {
+    const tm = timing(k.RB), nn = nearestNote(tm.f), rb = `R_B = ${k.chain.join(' + ')} = ${fmtR(k.RB)}`, ms = (tm.T * 1000).toFixed(2), dc = (tm.duty * 100).toFixed(0), ct = `${nn.cents >= 0 ? '+' : ''}${nn.cents}`;
+    TIPS['sc-' + k.id] = { k: 'Key ' + (i + 1), k_ar: 'المفتاح ' + (i + 1), t: `${k.id} → ${fmtHz(tm.f, false)}`, t_ar: `${k.id}: ${fmtHz(tm.f, true)}`, c: '#ffb340',
+      b: [rb, `Period ${ms} ms · duty ${dc}%`, `≈ ${nn.name} (${ct} cents)`], b_ar: [rb, `الدورة ${ms} ms · نسبة التشغيل ${dc}%`, `≈ ${nn.name} (${ct} سنت)`] };
+  });
 
   const sws = [...el.querySelectorAll('.sw')];
   const chg = el.querySelector('#flChg'), dis = el.querySelector('#flDis'), out = el.querySelector('#flOut');
@@ -214,7 +219,7 @@ export function buildSchematic(el, ro) {
       const c = ph % 2 === 0;
       chg.classList.toggle('on', c); dis.classList.toggle('on', !c);
       el.querySelector('#scR6').classList.toggle('lit', c);
-      tag.style.opacity = 1; tagTxt.textContent = c ? 'CHARGING' : 'DISCHARGING';
+      tag.style.opacity = 1; tagTxt.textContent = c ? t('CHARGING', 'شحن') : t('DISCHARGING', 'تفريغ');
       tag.querySelector('rect').setAttribute('stroke', c ? 'var(--amber)' : 'var(--cyan)');
       tag.querySelector('rect').setAttribute('fill', c ? 'rgba(255,179,64,.18)' : 'rgba(100,210,255,.18)');
       ph++; phaseTimer = setTimeout(cycle, (c ? tm.duty : 1 - tm.duty) * 2400);
@@ -223,6 +228,7 @@ export function buildSchematic(el, ro) {
     if (sound) blip('sch', tm.f, tm.duty, 700);
   }
   sws.forEach((w, i) => w.addEventListener('click', () => { userTouched = true; clearInterval(demoTimer); select(i, true); }));
+  onLang(() => { if (sel >= 0) ro.f.textContent = fmtHz(timing(KEYS[sel].RB).f); });
   return {
     select: i => { userTouched = true; clearInterval(demoTimer); select(i, true); },
     enter() { userTouched = false; let j = 0; select(-1); demoTimer = setInterval(() => { if (!userTouched) select(j++ % 5, false); }, 3200); setTimeout(() => { if (!userTouched) select(j++ % 5, false); }, 1400); },
@@ -248,7 +254,7 @@ export function buildInternal(el) {
   <text class="btxt s" x="243" y="331" style="font-size:16px">−</text><text class="btxt s" x="243" y="370" style="font-size:16px">+</text>
   <path class="iw" id="wR" d="M330,200 H420"/><path class="iw" id="wS" d="M330,350 H420"/>
   <rect class="blk" id="ff" x="420" y="165" width="150" height="220" rx="16" data-tip="in-ff"/>
-  <text class="btxt" x="495" y="250">FLIP</text><text class="btxt" x="495" y="280">FLOP</text>
+  <text class="btxt" x="495" y="250" data-ar="قلّاب">FLIP</text><text class="btxt" x="495" y="280" data-ar="SR">FLOP</text>
   <text class="btxt s" x="436" y="200">R</text><text class="btxt s" x="436" y="350">S</text>
   <text class="btxt" id="ffQ" x="495" y="330" style="font-size:20px;fill:var(--green)">Q = 1</text>
   <path class="iw" id="wQ" d="M570,275 H620"/>
@@ -262,15 +268,15 @@ export function buildInternal(el) {
   <path class="iw" id="wDis" d="M580,476 V440 H760"/><path class="iw" d="M580,544 V620"/>
   <rect x="760" y="417" width="56" height="46" rx="12" fill="rgba(41,151,255,.15)" stroke="var(--blue)" stroke-width="2"/><text class="btxt" x="788" y="441" style="font-size:20px">7</text>
   <text class="btxt" id="q1Txt" x="660" y="520" style="font-size:20px;fill:var(--muted)">OFF</text>
-  <text class="btxt s" x="560" y="590">DISCHARGE</text>
+  <text class="btxt s" x="560" y="590" data-ar="التفريغ">DISCHARGE</text>
   </svg>`;
   Object.assign(TIPS, {
-    'in-div': { k: 'Inside the 555', t: 'Voltage divider', c: '#ffb340', b: ['Three equal 5 kΩ resistors', 'Make the ⅔ VCC (6 V) and ⅓ VCC (3 V) references'] },
-    'in-cmpA': { k: 'Inside the 555', t: 'Threshold comparator', c: '#ffb340', b: ['Fires when C1 rises above 6 V', 'Resets the flip-flop → output LOW'] },
-    'in-cmpB': { k: 'Inside the 555', t: 'Trigger comparator', c: '#64d2ff', b: ['Fires when C1 falls below 3 V', 'Sets the flip-flop → output HIGH'] },
-    'in-ff': { k: 'Inside the 555', t: 'SR flip-flop', c: '#2997ff', b: ['1-bit memory of the state', 'Remembers: charging or discharging'] },
-    'in-out': { k: 'Inside the 555', t: 'Output stage', c: '#30d158', b: ['Buffers the flip-flop to pin 3', 'Can drive a small speaker'] },
-    'in-q1': { k: 'Inside the 555', t: 'Discharge transistor', c: '#2997ff', b: ['ON when output is LOW', 'Pin 7 to ground → C1 drains through R_B'] },
+    'in-div': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'Voltage divider', t_ar: 'مقسّم الجهد', c: '#ffb340', b: ['Three equal 5 kΩ resistors', 'Make the ⅔ VCC (6 V) and ⅓ VCC (3 V) references'], b_ar: ['ثلاث مقاومات متساوية قيمة كل منها 5 kΩ', 'تُنشئ المرجعين ⅔ VCC (6 V) و ⅓ VCC (3 V)'] },
+    'in-cmpA': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'Threshold comparator', t_ar: 'مقارن العتبة', c: '#ffb340', b: ['Fires when C1 rises above 6 V', 'Resets the flip-flop → output LOW'], b_ar: ['ينشط عندما يتجاوز جهد C1 قيمة 6 V', 'يعيد ضبط القلّاب ← الخرج منخفض'] },
+    'in-cmpB': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'Trigger comparator', t_ar: 'مقارن الإطلاق', c: '#64d2ff', b: ['Fires when C1 falls below 3 V', 'Sets the flip-flop → output HIGH'], b_ar: ['ينشط عندما ينخفض جهد C1 عن 3 V', 'يضبط القلّاب ← الخرج مرتفع'] },
+    'in-ff': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'SR flip-flop', t_ar: 'القلّاب SR', c: '#2997ff', b: ['1-bit memory of the state', 'Remembers: charging or discharging'], b_ar: ['ذاكرة بحجم بت واحد', 'يتذكّر الحالة: شحن أم تفريغ'] },
+    'in-out': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'Output stage', t_ar: 'مرحلة الخرج', c: '#30d158', b: ['Buffers the flip-flop to pin 3', 'Can drive a small speaker'], b_ar: ['تنقل حالة القلّاب إلى الطرف 3', 'قادرة على تشغيل سماعة صغيرة'] },
+    'in-q1': { k: 'Inside the 555', k_ar: 'داخل المؤقّت 555', t: 'Discharge transistor', t_ar: 'ترانزستور التفريغ', c: '#2997ff', b: ['ON when output is LOW', 'Pin 7 to ground → C1 drains through R_B'], b_ar: ['يعمل عندما يكون الخرج منخفضاً', 'يصل الطرف 7 بالأرضي فيتفرّغ C1 عبر R_B'] },
   });
   const $ = id => el.querySelector('#' + id);
   let flashA = 0, flashB = 0;
@@ -281,12 +287,12 @@ export function buildInternal(el) {
       $('cmpB').classList.toggle('on', performance.now() < flashB);
       $('ff').classList.toggle('on', true);
       ['wQ', 'wOut'].forEach(w => $(w).classList.toggle('hi', high));
-      $('outTxt').textContent = high ? 'HIGH' : 'LOW'; $('outTxt').style.fill = high ? 'var(--green)' : 'var(--muted)';
+      $('outTxt').textContent = high ? t('HIGH', 'مرتفع') : t('LOW', 'منخفض'); $('outTxt').style.fill = high ? 'var(--green)' : 'var(--muted)';
       $('ffQ').textContent = high ? 'Q = 1' : 'Q = 0';
       $('q1').classList.toggle('on', !high);
       $('wB').classList.toggle('hi', !high); $('wDis').classList.toggle('hi', !high);
       $('wDis').style.stroke = !high ? 'var(--blue)' : ''; $('wB').style.stroke = !high ? 'var(--blue)' : '';
-      $('q1Txt').textContent = high ? 'OFF' : 'ON'; $('q1Txt').style.fill = high ? 'var(--muted)' : 'var(--blue)';
+      $('q1Txt').textContent = high ? t('OFF', 'مطفأ') : t('ON', 'يعمل'); $('q1Txt').style.fill = high ? 'var(--muted)' : 'var(--blue)';
       $('vcTxt').textContent = vc.toFixed(1) + ' V';
       $('wR').classList.toggle('hi', performance.now() < flashA); $('wS').classList.toggle('hi', performance.now() < flashB);
     },

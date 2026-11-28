@@ -140,8 +140,9 @@ export class PartsScene extends View {
   select(i, user) { this.sel = i; if (user) this.userT = performance.now(); this.onSelect && this.onSelect(i); }
   update(dt, t) {
     this.selF += (this.sel - this.selF) * Math.min(1, dt * 4.5);
+    const flip = document.documentElement.dir === 'rtl' ? -1 : 1; // Arabic: the line of parts runs right-to-left
     this.items.forEach((h, i) => {
-      const d = i - this.selF, a = Math.abs(d), sg = Math.sign(d), near = Math.min(a, 1);
+      const d = (i - this.selF) * flip, a = Math.abs(d), sg = Math.sign(d), near = Math.min(a, 1);
       h.position.x = a < 1 ? d * 2.3 : sg * (2.3 + (a - 1) * 1.45);
       h.position.z = -near * 2.4 - Math.max(0, a - 1) * 0.7;
       h.position.y = (a < 0.5 ? Math.sin(t * 1.5) * 0.08 + 0.2 : 0) - near * 0.1;

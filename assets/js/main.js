@@ -3,6 +3,7 @@ import { TIPS, SPECS, PART_INFO, PINS, SKILLS, REFS } from './data.js';
 import { buildOmanMap, buildShinasZoom, buildFlow, buildOrbit, buildSchematic, buildInternal } from './diagrams.js';
 import { gradChart, freqChart, astableChart, scope } from './charts.js';
 import { KEYS, timing, noteOn, noteOff, level, fmtHz, nearestNote, fmtR } from './audio.js';
+import { t, L, isAr, iso, applyDoc, setLang, onLang } from './i18n.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -14,10 +15,15 @@ addEventListener('resize', fit); fit();
 
 /* ================= TOOLTIP ================= */
 const tip = $('#tip'); let tipEl = null;
+const fx = s => String(s).replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>');
 function tipHTML(d) {
-  return `${d.k ? `<div class="k">${d.k}</div>` : ''}<div class="t">${d.t.replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>')}</div>${d.ar ? `<div class="ar">${d.ar}</div>` : ''}
-  ${d.b ? `<div class="b">${d.b.map(x => `<div>${x.replace(/R_A/g, 'R<sub>A</sub>').replace(/R_B/g, 'R<sub>B</sub>')}</div>`).join('')}</div>` : ''}
-  ${d.s ? `<div class="s">${d.s.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('')}</div>` : ''}${d.src ? `<div class="src">${d.src}</div>` : ''}`;
+  const ar = isAr();
+  const title = ar ? (d.t_ar ?? d.ar ?? d.t) : d.t;
+  const sub = ar ? (d.ar ? d.t : null) : d.ar;          // the other-language name, when there is one
+  const k = L(d, 'k'), b = L(d, 'b'), st = L(d, 's'), src = L(d, 'src');
+  return `${k ? `<div class="k">${iso(k)}</div>` : ''}<div class="t">${iso(fx(title))}</div>${sub ? `<div class="sub${ar ? '' : ' ar'}">${iso(sub)}</div>` : ''}
+  ${b ? `<div class="b">${b.map(x => `<div>${iso(fx(x))}</div>`).join('')}</div>` : ''}
+  ${st ? `<div class="s">${st.map(([v, l]) => `<div><b>${iso(v)}</b><span>${l}</span></div>`).join('')}</div>` : ''}${src ? `<div class="src">${src}</div>` : ''}`;
 }
 function showTip(el) {
   const d = TIPS[el.dataset.tip]; if (!d) return;
@@ -52,11 +58,11 @@ function countUp(root) {
   });
 }
 // specialisation tiles
-$('#tiles').innerHTML = SPECS.map((s, i) => { TIPS['spec-' + i] = { k: 'Specialisation', t: s.k, c: s.c, b: s.b }; return `<div class="tile glass hov r" style="--i:${i + 3};--c:${s.c}" data-tip="spec-${i}"><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
+$('#tiles').innerHTML = SPECS.map((s, i) => { TIPS['spec-' + i] = { k: 'Specialisation', k_ar: 'تخصص', t: s.k, t_ar: s.k_ar, c: s.c, b: s.b, b_ar: s.b_ar }; return `<div class="tile glass hov r" style="--i:${i + 3};--c:${s.c}" data-tip="spec-${i}"><svg viewBox="0 0 24 24">${s.ic}</svg><b data-ar="${s.k_ar}">${s.k}</b></div>`; }).join('');
 // skills
-$('#skills').innerHTML = SKILLS.map((s, i) => { TIPS['skill-' + i] = { k: 'Skill ' + (i + 1), t: s.k, c: s.c, b: s.b }; return `<div class="skill glass hov r" style="--i:${i + 2};--c:${s.c}" data-tip="skill-${i}"><span class="n">0${i + 1}</span><svg viewBox="0 0 24 24">${s.ic}</svg><b>${s.k}</b></div>`; }).join('');
+$('#skills').innerHTML = SKILLS.map((s, i) => { TIPS['skill-' + i] = { k: 'Skill ' + (i + 1), k_ar: 'المهارة ' + (i + 1), t: s.k, t_ar: s.k_ar, c: s.c, b: s.b, b_ar: s.b_ar }; return `<div class="skill glass hov r" style="--i:${i + 2};--c:${s.c}" data-tip="skill-${i}"><span class="n">0${i + 1}</span><svg viewBox="0 0 24 24">${s.ic}</svg><b data-ar="${s.k_ar}">${s.k}</b></div>`; }).join('');
 // references
-$('#refs').innerHTML = REFS.map(([t, u], i) => `<div><em>${String(i + 1).padStart(2, '0')}</em>${t}<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https?:\/\//, '')}</a></div>`).join('');
+$('#refs').innerHTML = REFS.map(([en, ar, u], i) => `<div><em>${String(i + 1).padStart(2, '0')}</em><span data-ar="${ar}">${en}</span><a href="${u}" target="_blank" rel="noopener" dir="ltr">${u.replace(/^https?:\/\//, '')}</a></div>`).join('');
 // breadboard hotspots
 const HS = [
   { x: 30.7, y: 28, tip: 'hs-spk' }, { x: 95.2, y: 69, tip: 'hs-bat' }, { x: 70.6, y: 64, tip: 'hs-555' }, { x: 64.5, y: 55.3, tip: 'hs-c3' },
@@ -64,20 +70,20 @@ const HS = [
   ...[19.2, 28.2, 37.3, 46.4, 55.4].map((x, i) => ({ x, y: 63, tip: 'hs-key' + i, key: i })),
 ];
 Object.assign(TIPS, {
-  'hs-spk': { k: 'Output', t: '8 Ω speaker', c: '#bf5af2', b: ['Oval speaker, wired by the white leads', 'Plays the square-wave tone'] },
-  'hs-bat': { k: 'Power', t: '9 V battery (6F22)', c: '#30d158', b: ['Red → + rail, blue → − rail', 'Feeds the whole breadboard'] },
-  'hs-555': { k: 'The brain', t: '555 timer IC', c: '#2997ff', b: ['8-pin DIP across the centre gap', 'Generates the oscillation'] },
-  'hs-c3': { k: 'Coupling', t: '10 µF electrolytic', c: '#ffb340', b: ['C3 between pin 3 and the speaker', 'Mind the polarity'] },
-  'hs-cer': { k: 'Timing & filtering', t: 'Ceramic capacitors', c: '#ffb340', b: ['C1 100 nF — timing', 'C2 10 nF — pin 5 noise filter'] },
-  'hs-res': { k: 'Pitch ladder', t: '6 resistors', c: '#64d2ff', b: ['5 × 1 kΩ + 1 × 5.1 kΩ', 'Blue metal-film, 5 colour bands'] },
-  'hs-rail': { k: 'Wiring', t: 'Power rails', c: '#ff453a', b: ['+ and − rails along the edges', 'Jumper wires link everything'] },
+  'hs-spk': { k: 'Output', k_ar: 'الخرج', t: '8 Ω speaker', t_ar: 'سماعة 8 Ω', c: '#bf5af2', b: ['Oval speaker, wired by the white leads', 'Plays the square-wave tone'], b_ar: ['سماعة بيضاوية موصولة بالسلكين الأبيضين', 'تعزف نغمة الموجة المربعة'] },
+  'hs-bat': { k: 'Power', k_ar: 'الطاقة', t: '9 V battery (6F22)', t_ar: 'بطارية 9 V من نوع 6F22', c: '#30d158', b: ['Red → + rail, blue → − rail', 'Feeds the whole breadboard'], b_ar: ['الأحمر إلى الخط الموجب والأزرق إلى السالب', 'تغذّي لوحة التجارب بالكامل'] },
+  'hs-555': { k: 'The brain', k_ar: 'العقل المدبّر', t: '555 timer IC', t_ar: 'الدائرة المتكاملة 555', c: '#2997ff', b: ['8-pin DIP across the centre gap', 'Generates the oscillation'], b_ar: ['شريحة بثمانية أطراف فوق الفاصل الأوسط', 'تولّد التذبذب'] },
+  'hs-c3': { k: 'Coupling', k_ar: 'الربط', t: '10 µF electrolytic', t_ar: 'مكثف إلكتروليتي 10 µF', c: '#ffb340', b: ['C3 between pin 3 and the speaker', 'Mind the polarity'], b_ar: ['C3 بين الطرف 3 والسماعة', 'انتبه للقطبية'] },
+  'hs-cer': { k: 'Timing & filtering', k_ar: 'التوقيت والترشيح', t: 'Ceramic capacitors', t_ar: 'مكثفات سيراميكية', c: '#ffb340', b: ['C1 100 nF — timing', 'C2 10 nF — pin 5 noise filter'], b_ar: ['المكثف C1 بسعة 100 nF للتوقيت', 'المكثف C2 بسعة 10 nF لترشيح ضجيج الطرف 5'] },
+  'hs-res': { k: 'Pitch ladder', k_ar: 'سُلّم النغمات', t: '6 resistors', t_ar: '6 مقاومات', c: '#64d2ff', b: ['5 × 1 kΩ + 1 × 5.1 kΩ', 'Blue metal-film, 5 colour bands'], b_ar: ['5 × 1 kΩ + 1 × 5.1 kΩ', 'غشاء معدني أزرق بخمس حلقات ملوّنة'] },
+  'hs-rail': { k: 'Wiring', k_ar: 'التوصيلات', t: 'Power rails', t_ar: 'خطوط الطاقة', c: '#ff453a', b: ['+ and − rails along the edges', 'Jumper wires link everything'], b_ar: ['خطّا الموجب والسالب على الحواف', 'أسلاك التوصيل تربط كل شيء'] },
 });
 const bp = $('#buildPhoto');
 HS.forEach((h, i) => {
   const d = document.createElement('div'); d.className = 'hs' + (h.key != null ? ' key' : ''); d.style.cssText = `left:${h.x}%;top:${h.y}%;--i:${i}`; d.dataset.tip = h.tip;
   if (h.key != null) {
     const k = KEYS[h.key], tm = timing(k.RB);
-    TIPS[h.tip] = { k: 'Key ' + (h.key + 1), t: `${k.id} · ${fmtHz(tm.f)}`, c: '#ffb340', b: ['Click to hear this key', `R_B = ${fmtR(k.RB)}`] };
+    TIPS[h.tip] = { k: 'Key ' + (h.key + 1), k_ar: 'المفتاح ' + (h.key + 1), t: `${k.id} · ${fmtHz(tm.f, false)}`, t_ar: `${k.id} · ${fmtHz(tm.f, true)}`, c: '#ffb340', b: ['Click to hear this key', `R_B = ${fmtR(k.RB)}`], b_ar: ['انقر لتسمع هذا المفتاح', `R_B = ${fmtR(k.RB)}`] };
     d.addEventListener('pointerdown', () => noteOn('hs', tm.f, tm.duty)); d.addEventListener('pointerup', () => noteOff('hs')); d.addEventListener('pointerleave', () => noteOff('hs'));
   }
   bp.appendChild(d);
@@ -110,13 +116,15 @@ hooks['s-programs'] = { enter() { orbit.enter(); grads.enter(); }, leave() { orb
 
 // PARTS carousel
 const partInfo = $('#partInfo'), partBar = $('#partBar');
-partBar.innerHTML = PARTS.map((p, i) => `<button data-i="${i}">${PART_INFO[p.id].n === 'Resistor' || PART_INFO[p.id].n.includes('cap') ? PART_INFO[p.id].v.split(' ·')[0] : PART_INFO[p.id].n}</button>`).join('');
-PARTS.forEach(p => { const d = PART_INFO[p.id]; TIPS['part-' + p.id] = { k: `${d.n} · ×${d.q}`, t: d.v, c: d.c, b: d.tip }; });
+partBar.innerHTML = PARTS.map((p, i) => { const d = PART_INFO[p.id]; return `<button data-i="${i}" data-ar="${d.bar_ar ?? `<bdi dir='ltr'>${d.bar}</bdi>`}">${d.bar}</button>`; }).join('');
+PARTS.forEach(p => { const d = PART_INFO[p.id]; TIPS['part-' + p.id] = { k: `${d.n} · ×${d.q}`, k_ar: `${d.n_ar} · ×${d.q}`, t: d.v, t_ar: d.v_ar, c: d.c, b: d.tip, b_ar: d.tip_ar }; });
+let curPart = 0;
 function showPart(i) {
-  const p = PARTS[i], d = PART_INFO[p.id];
-  partInfo.innerHTML = `<div class="swap" data-tip="part-${p.id}"><div class="pname">${d.n}</div><div class="pval" style="color:${d.c}">${d.v}</div><div class="prole">${d.role}</div><div class="qty">× ${d.q}</div></div>`;
+  const p = PARTS[i], d = PART_INFO[p.id]; curPart = i;
+  partInfo.innerHTML = `<div class="swap" data-tip="part-${p.id}"><div class="pname">${L(d, 'n')}</div><div class="pval" style="color:${d.c}">${iso(L(d, 'v'))}</div><div class="prole">${L(d, 'role')}</div><div class="qty">× ${d.q}</div></div>`;
   $$('button', partBar).forEach((b, j) => b.classList.toggle('on', j === i));
 }
+onLang(() => showPart(curPart));
 const parts = lazy(() => { const s = new PartsScene($('#parts3d')); s.onSelect = showPart; return s; });
 let partTimer;
 partBar.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { parts().select(+b.dataset.i, true); } });
@@ -132,7 +140,7 @@ hooks['s-circuit'] = { enter: sch.enter, leave() { sch.leave(); $('#origThumb').
 // PINOUT
 const pinLabels = $('#pinLabels'), leaders = $('#pinLeaders');
 pinLabels.innerHTML = PINS.map(p => `<div class="plabel" data-pin="${p.n}" data-tip="pin-${p.n}" style="--c:${p.c}"><em>${p.n}</em>${p.k}</div>`).join('');
-PINS.forEach(p => { TIPS['pin-' + p.n] = { k: `Pin ${p.n} · ${p.k}`, t: p.t, c: p.c, b: p.b }; });
+PINS.forEach(p => { TIPS['pin-' + p.n] = { k: `Pin ${p.n} · ${p.k}`, k_ar: `الطرف ${p.n} · ${p.k}`, t: p.t, t_ar: p.t_ar, c: p.c, b: p.b, b_ar: p.b_ar }; });
 leaders.innerHTML = PINS.map(() => '<line/>').join('');
 const pinout = lazy(() => {
   const s = new PinoutScene($('#pin3d'));
@@ -163,7 +171,7 @@ hooks['s-freq'] = fq;
 // PIANO
 const COLS = ['#ff453a', '#ff9f0a', '#ffd60a', '#30d158', '#64d2ff'];
 let nowKey = -1;
-$('#pianoKeys').innerHTML = KEYS.map((k, i) => { const tm = timing(k.RB), nn = nearestNote(tm.f); return `<div class="pkey" data-i="${i}" style="--c:${COLS[i]}"><small>${k.id}</small><b>${i + 1}</b><span>${Math.round(tm.f)} Hz</span></div>`; }).join('');
+$('#pianoKeys').innerHTML = KEYS.map((k, i) => { const tm = timing(k.RB), nn = nearestNote(tm.f); return `<div class="pkey" data-i="${i}" style="--c:${COLS[i]}"><small>${k.id}</small><b>${i + 1}</b><span data-ar="${Math.round(tm.f)} هرتز">${Math.round(tm.f)} Hz</span></div>`; }).join('');
 const pkeys = $$('.pkey');
 function press(i, on) {
   const k = KEYS[i], tm = timing(k.RB);
@@ -177,7 +185,8 @@ pkeys.forEach((el, i) => {
   el.addEventListener('pointercancel', () => press(i, false));
 });
 const spk = lazy(() => new SpeakerScene($('#spk3d'), level));
-const sc = scope($('#scope'), () => nowKey >= 0 ? fmtHz(timing(KEYS[nowKey].RB).f) : 'idle');
+const sc = scope($('#scope'), () => nowKey >= 0 ? fmtHz(timing(KEYS[nowKey].RB).f) : t('idle', 'بانتظار العزف'));
+onLang(() => { if (nowKey < 0) $('#nowPlaying').innerHTML = ''; });
 hooks['s-piano'] = {
   enter() { spk().start(); sc.enter(); $('#nowPlaying').innerHTML = ''; },
   leave() { spk().stop(); sc.leave(); KEYS.forEach((_, i) => press(i, false)); },
@@ -223,6 +232,7 @@ addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); prev(); }
   else if (k === 'Home') go(0);
   else if (k === 'End') go(slides.length - 1);
+  else if (k === 'l' || k === 'L') toggleLang();
   else if (k === 'f' || k === 'F') { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
   else if (/^[1-5]$/.test(k)) {
     const i = +k - 1, h = hooks[slides[cur].id];
@@ -237,6 +247,11 @@ addEventListener('keyup', e => { if (/^[1-5]$/.test(e.key) && held.has(e.key)) {
 let sx = null;
 stage.addEventListener('pointerdown', e => { sx = e.target.closest('button,[data-tip],canvas,.pkey,.three,.sw') ? null : e.clientX; });
 stage.addEventListener('pointerup', e => { if (sx != null && Math.abs(e.clientX - sx) > 80) (e.clientX < sx ? next : prev)(); sx = null; });
+
+// language toggle (button, L key, ?lang=ar)
+function toggleLang() { hideTip(); setLang(isAr() ? 'en' : 'ar'); }
+$('#langBtn').addEventListener('click', toggleLang);
+applyDoc();
 
 const start = parseInt(location.hash.slice(1)) - 1;
 go(Number.isFinite(start) && start >= 0 ? start : 0);
